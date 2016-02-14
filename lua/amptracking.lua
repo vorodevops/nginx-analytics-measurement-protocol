@@ -7,12 +7,15 @@ local request = {
 }
 
 local headers = ngx.req.get_headers()
-if headers.dnt == nil then
+if headers.dnt == nil or headers.dnt == '0' then
   request["uip"] = ngx.var.remote_addr
   request["ua"] = ngx.var.http_user_agent
   request["ul"] = ngx.var.http_accept_language
+  local referer = ngx.var.http_referer
+  if referer and referer ~= '' then
+    request["dr"] = referer
+  end
 end
-
 
 local res = ngx.location.capture(
   "/amp-collect",
